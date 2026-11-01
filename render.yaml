@@ -1,0 +1,44 @@
+# Render Blueprint Specification (render.yaml)
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # ---------------------------------------------------------------------------
+  # 1. Backend Web Service (FastAPI + OpenCV + NetworkX)
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: evacuation-route-backend
+    runtime: docker
+    dockerContext: ./backend
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+
+  # ---------------------------------------------------------------------------
+  # 2. Frontend Static Site (React + Vite + TypeScript + Tailwind)
+  # ---------------------------------------------------------------------------
+  - type: web
+    name: evacuation-route-frontend
+    runtime: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    plan: free
+    region: oregon
+    routes:
+      # Single Page Application (SPA) client-side routing
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      # Links frontend build to backend web service domain
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: evacuation-route-backend
+          property: host
+

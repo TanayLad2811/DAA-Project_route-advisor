@@ -1,0 +1,38 @@
+# Environment and Virtualenvs
+.venv/
+venv/
+ENV/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/
+
+# Application Data
+backend/data/uploads/*
+!backend/data/uploads/.gitkeep
+backend/data/graphs/*
+!backend/data/graphs/.gitkeep
+
+# IDEs & System
+.vscode/
+.idea/
+*.swp
+*.swo
+Thumbs.db
+Desktop.ini
+.DS_Store
+
