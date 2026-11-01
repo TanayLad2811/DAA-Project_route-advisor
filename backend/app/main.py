@@ -1,5 +1,9 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.graph import router as graph_router
 from app.api.hazards import router as hazards_router
@@ -36,3 +40,18 @@ def health_check():
         "app": settings.app_name,
         "version": "0.1.0",
     }
+
+
+# Mount production frontend static files if present
+static_dir = Path(__file__).resolve().parent.parent / "static"
+if static_dir.exists() and (static_dir / "index.html").exists():
+    if (static_dir / "assets").exists():
+        app.mount("/assets", StaticFiles(directory=static_dir / "assets"), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    def serve_frontend_spa(full_path: str):
+        target = static_dir / full_path
+        if target.exists() and target.is_file():
+            return FileResponse(target)
+        return FileResponse(static_dir / "index.html")
+
